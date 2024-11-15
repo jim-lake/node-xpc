@@ -1,0 +1,31 @@
+{
+  "name": "node-xpc",
+  "version": "0.0.2",
+  "description": "XPC for node and electron",
+  "main": "dist/index.js",
+  "gypfile": true,
+  "license": "MIT",
+  "files": [
+    "binding.gyp",
+    "src/mac/",
+    "dist/"
+  ],
+  "scripts": {
+    "build": "node-gyp build && tsc",
+    "pretty": "prettier --write binding.gyp --parser json && prettier --write src/**/*.ts dist/**/*.js dist/**/*.ts example/**/* && clang-format -i src/mac/*",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "bindings": "^1.5.0",
+    "node-addon-api": "^8.2.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.13.0",
+    "@types/eslint__js": "8.42.3",
+    "@types/node": "^22.7.7",
+    "@typescript-eslint/parser": "8.10.0",
+    "eslint": "9.13.0",
+    "typescript": "5.6.3",
+    "typescript-eslint": "8.10.0"
+  }
+}
