@@ -71,18 +71,18 @@ Napi::Value xpcToValue(Napi::Env env, const xpc_object_t obj) {
   xpc_type_t type = xpc_get_type(obj);
 
   if (type == XPC_TYPE_ERROR) {
-    const auto error = Object::New(env);
+    const auto out = Object::New(env);
     if (obj == XPC_ERROR_CONNECTION_INTERRUPTED) {
-      error.Set("error", String::New(env, "XPC_ERROR_CONNECTION_INTERRUPTED"));
+      out.Set("error", String::New(env, "XPC_ERROR_CONNECTION_INTERRUPTED"));
     } else if (obj == XPC_ERROR_CONNECTION_INVALID) {
-      error.Set("error", String::New(env, "XPC_ERROR_CONNECTION_INVALID"));
+      out.Set("error", String::New(env, "XPC_ERROR_CONNECTION_INVALID"));
     } else if (obj == XPC_ERROR_TERMINATION_IMMINENT) {
-      error.Set("error", String::New(env, "XPC_ERROR_TERMINATION_IMMINENT"));
+      out.Set("error", String::New(env, "XPC_ERROR_TERMINATION_IMMINENT"));
     } else {
-      error.Set("error", String::New(env, xpc_dictionary_get_string(
-                                              obj, XPC_ERROR_KEY_DESCRIPTION)));
+      out.Set("error", String::New(env, xpc_dictionary_get_string(
+                                            obj, XPC_ERROR_KEY_DESCRIPTION)));
     }
-    ret = error;
+    ret = out;
   } else if (type == XPC_TYPE_INT64) {
     ret = BigInt::New(env, xpc_int64_get_value(obj));
   } else if (type == XPC_TYPE_UINT64) {
@@ -90,19 +90,19 @@ Napi::Value xpcToValue(Napi::Env env, const xpc_object_t obj) {
   } else if (type == XPC_TYPE_STRING) {
     ret = String::New(env, xpc_string_get_string_ptr(obj));
   } else if (type == XPC_TYPE_DICTIONARY) {
-    Object obj = Object::New(env);
+    auto out = Object::New(env);
     xpc_dictionary_apply(obj, ^bool(const char *key, xpc_object_t value) {
-      obj.Set(key, xpcToValue(env, value));
+      out.Set(key, xpcToValue(env, value));
       return true;
     });
-    ret = obj;
+    ret = out;
   } else if (type == XPC_TYPE_ARRAY) {
-    Array array = Array::New(env);
+    auto out = Array::New(env);
     xpc_array_apply(obj, ^bool(size_t index, xpc_object_t value) {
-      array.Set(index, xpcToValue(env, value));
+      out.Set(index, xpcToValue(env, value));
       return true;
     });
-    ret = array;
+    ret = out;
   } else if (type == XPC_TYPE_DATA) {
     ret = Buffer<uint8_t>::Copy(env, (uint8_t *)xpc_data_get_bytes_ptr(obj),
                                 xpc_data_get_length(obj));
