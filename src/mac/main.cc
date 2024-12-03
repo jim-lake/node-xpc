@@ -26,9 +26,9 @@ static void _callback(const uint32_t connection_id, const uint32_t callback_id,
     params->connection_id = connection_id;
     params->callback_id = callback_id;
     params->obj = obj;
-    if (g_tsfn.BlockingCall(params, napiCallback) == napi_closing) {
-      g_tsfn.Release();
-      g_tsfn = NULL;
+    const auto ret = g_tsfn.BlockingCall(params, napiCallback);
+    if (ret != napi_ok) {
+      printf("node-xpc: BlockingCall error: %d\n", ret);
     }
   } else {
     printf("node-xpc: No threadsafefunction available!\n");
@@ -63,7 +63,9 @@ Value Connect(const Napi::CallbackInfo &info) {
   const Napi::Env env = info.Env();
   Value ret = env.Null();
 
-  if (info.Length() < 2) {
+  if (g_tsfn == NULL) {
+    ret = String::New(env, "Setup not run");
+  } else if (info.Length() < 2) {
     ret = String::New(env, "Expected 2 arguments");
   } else if (!info[0].IsString()) {
     ret = String::New(env, "Expected string arg 0");
@@ -87,6 +89,9 @@ Value Send(const Napi::CallbackInfo &info) {
   const Napi::Env env = info.Env();
   Value ret = env.Null();
 
+  if (g_tsfn == NULL) {
+    ret = String::New(env, "Setup not run");
+  }
   if (info.Length() < 2) {
     ret = String::New(env, "Expected 2 arguments");
   } else if (!info[0].IsNumber()) {

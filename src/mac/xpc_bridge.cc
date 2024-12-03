@@ -38,8 +38,10 @@ std::string bridge_cancel(const uint32_t connection_id) {
   if (iter == g_map->end()) {
     ret = "connection_not_found";
   } else {
-    xpc_connection_cancel(iter->second);
+    const auto conn = iter->second;
     g_map->erase(connection_id);
+    xpc_connection_cancel(conn);
+    xpc_release(conn);
   }
   return ret;
 }

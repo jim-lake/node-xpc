@@ -1,8 +1,10 @@
 const xpc = require('../dist/index');
 
-console.log('start');
+const interval = parseInt(process.argv.pop()) || 1000;
+console.log('start: interval:', interval);
 
 let g_conn = null;
+let g_count = 0;
 
 function getConnection(name, flags) {
   if (g_conn && !g_conn.isValid()) {
@@ -28,7 +30,7 @@ function getConnection(name, flags) {
 setInterval(() => {
   const conn = getConnection('com.ares.test.server2', 0n);
 
-  console.log('send');
+  console.log('send:', g_count++);
   conn.send({
     f: 33n,
     root: Buffer.from('1234', 'hex'),
@@ -36,9 +38,9 @@ setInterval(() => {
     replysig: `v12@?0B8`,
     sequence: 1n,
   });
-  console.log('send done');
+  //console.log('send done');
 
-  console.log('send with done');
+  //console.log('send with done');
   conn.send(
     {
       f: 33n,
@@ -51,5 +53,5 @@ setInterval(() => {
       console.log('done:', err, result);
     }
   );
-  console.log('send with done done');
-}, 1000);
+  //console.log('send with done done');
+}, interval);

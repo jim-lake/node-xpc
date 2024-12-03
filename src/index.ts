@@ -3,6 +3,7 @@ const EventEmitter = require('node:events');
 
 let g_connectCount = 0;
 let g_callbackId = 1;
+let g_isSetup = false;
 
 const g_emitMap = new Map<number, XPCConnection>();
 const g_callbackMap = new Map<number, (err?: any, obj?: any) => void>();
@@ -11,7 +12,8 @@ class XPCConnection extends EventEmitter {
   _connectionId = 0;
   _isValid = true;
   connect(name: string, flags?: bigint): string | null {
-    if (g_connectCount === 0) {
+    if (!g_isSetup) {
+      g_isSetup = true;
       addon.setup(_callback);
     }
     let ret = addon.connect(name, flags ?? 0n);
@@ -20,8 +22,6 @@ class XPCConnection extends EventEmitter {
       this._connectionId = ret;
       g_emitMap.set(ret, this);
       ret = null;
-    } else {
-      _maybeCleanup();
     }
     return ret;
   }
@@ -41,22 +41,29 @@ class XPCConnection extends EventEmitter {
   }
   _handleError(error: any) {
     if (error === 'XPC_ERROR_CONNECTION_INVALID') {
-      this._isValid = false;
+      this._cancel();
       this.emit('connection_invalid');
     }
   }
-  cancel() {
+  _cancel() {
     if (this._connectionId) {
       addon.cancel(this._connectionId);
       this._isValid = false;
       this._connectionId = 0;
-      this.emit('cancel');
       g_connectCount--;
-      _maybeCleanup();
     }
   }
+  cancel() {
+    this._cancel();
+    this.emit('cancel');
+  }
 }
-
+function shutdown() {
+  if (g_connectCount === 0) {
+    g_isSetup = false;
+    addon.setup(null);
+  }
+}
 function _callback(connection_id: number, callback_id: number, result: any) {
   const obj = g_emitMap.get(connection_id);
   const callback = g_callbackMap.get(callback_id);
@@ -85,9 +92,5 @@ function _callback(connection_id: number, callback_id: number, result: any) {
     );
   }
 }
-function _maybeCleanup() {
-  if (g_connectCount === 0) {
-    addon.setup(null);
-  }
-}
 exports.XPCConnection = XPCConnection;
+exports.shutdown = shutdown;

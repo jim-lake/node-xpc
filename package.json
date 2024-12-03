@@ -1,6 +1,6 @@
 {
   "name": "node-xpc",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "XPC for node and electron",
   "main": "dist/index.js",
   "gypfile": true,
