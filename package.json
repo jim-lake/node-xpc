@@ -1,9 +1,10 @@
 {
   "name": "node-xpc",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "XPC for node and electron",
   "main": "dist/index.js",
   "gypfile": true,
+  "os": ["darwin"],
   "license": "MIT",
   "files": [
     "binding.gyp",
