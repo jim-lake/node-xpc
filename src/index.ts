@@ -1,5 +1,5 @@
-const addon = require('../build/Release/node_xpc.node');
-const EventEmitter = require('node:events');
+import EventEmitter from 'node:events';
+import addon from '../build/Release/node_xpc.node';
 
 let g_connectCount = 0;
 let g_callbackId = 1;
@@ -8,7 +8,7 @@ let g_isSetup = false;
 const g_emitMap = new Map<number, XPCConnection>();
 const g_callbackMap = new Map<number, (err?: any, obj?: any) => void>();
 
-class XPCConnection extends EventEmitter {
+export class XPCConnection extends EventEmitter {
   _connectionId = 0;
   _isValid = true;
   connect(name: string, flags?: bigint): string | null {
@@ -58,12 +58,13 @@ class XPCConnection extends EventEmitter {
     this.emit('cancel');
   }
 }
-function shutdown() {
+export function shutdown() {
   if (g_connectCount === 0) {
     g_isSetup = false;
     addon.setup(null);
   }
 }
+
 function _callback(connection_id: number, callback_id: number, result: any) {
   const obj = g_emitMap.get(connection_id);
   const callback = g_callbackMap.get(callback_id);
@@ -92,5 +93,4 @@ function _callback(connection_id: number, callback_id: number, result: any) {
     );
   }
 }
-exports.XPCConnection = XPCConnection;
-exports.shutdown = shutdown;
+export default { XPCConnection, shutdown };

@@ -1,8 +1,9 @@
 {
   "name": "node-xpc",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "XPC for node and electron",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "gypfile": true,
   "os": ["darwin"],
   "license": "MIT",
@@ -13,7 +14,7 @@
   ],
   "scripts": {
     "build": "node-gyp build && tsc",
-    "pretty": "prettier --write binding.gyp --parser json && prettier --write src/**/*.ts dist/**/*.js dist/**/*.ts example/**/* && clang-format -i src/mac/*",
+    "pretty": "prettier --write binding.gyp --parser json && prettier --write src/**/*.ts example/**/* && clang-format -i src/mac/*",
     "lint": "eslint src"
   },
   "dependencies": {

@@ -1,23 +1,17 @@
-declare const addon: any;
-declare const EventEmitter: any;
-declare let g_connectCount: number;
-declare let g_callbackId: number;
-declare let g_isSetup: boolean;
-declare const g_emitMap: Map<number, XPCConnection>;
-declare const g_callbackMap: Map<number, (err?: any, obj?: any) => void>;
-declare class XPCConnection extends EventEmitter {
-  _connectionId: number;
-  _isValid: boolean;
-  connect(name: string, flags?: bigint): string | null;
-  send(message: any, done?: (err?: any, message?: any) => void): any;
-  isValid(): boolean;
-  _handleError(error: any): void;
-  _cancel(): void;
-  cancel(): void;
+import EventEmitter from 'node:events';
+export declare class XPCConnection extends EventEmitter {
+    _connectionId: number;
+    _isValid: boolean;
+    connect(name: string, flags?: bigint): string | null;
+    send(message: any, done?: (err?: any, message?: any) => void): any;
+    isValid(): boolean;
+    _handleError(error: any): void;
+    _cancel(): void;
+    cancel(): void;
 }
-declare function shutdown(): void;
-declare function _callback(
-  connection_id: number,
-  callback_id: number,
-  result: any
-): void;
+export declare function shutdown(): void;
+declare const _default: {
+    XPCConnection: typeof XPCConnection;
+    shutdown: typeof shutdown;
+};
+export default _default;
